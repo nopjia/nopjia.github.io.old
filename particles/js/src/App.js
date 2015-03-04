@@ -2,6 +2,7 @@ var App = function() {
 
     var _params, _gui, _guiFields, _engine;
     var _mapper, _mapTarget;
+    var _customUpdate;
 
     var _currShape; // to display in GUI on init
 
@@ -24,7 +25,8 @@ var App = function() {
         this.simMat = createShaderMaterial(SimShader);
         var _drawMat = this.drawMat = createShaderMaterial(ParticleShader);
         this.update = function(dt, t) {
-            _drawMat.uniforms.uTime.value = t;
+            _drawMat.uniforms.uTime.value = t;  // for ParticleShader.vs
+            if (_customUpdate) _customUpdate(dt, t);
         };
     };
 
@@ -34,15 +36,15 @@ var App = function() {
     var _DEFAULT_SHAPE = "galaxy";
 
     var _presetShapes = {
-        "none": "SIM_NO_SHAPE",
-        "plane": "SIM_PLANE",
-        "cube": "SIM_CUBE",
-        "disc": "SIM_DISC",
+        "none":   "SIM_NO_SHAPE",
+        "plane":  "SIM_PLANE",
+        "cube":   "SIM_CUBE",
+        "disc":   "SIM_DISC",
         "sphere": "SIM_SPHERE",
-        "ball": "SIM_BALL",
+        "ball":   "SIM_BALL",
         "petals": "SIM_ROSE_GALAXY",
         "galaxy": "SIM_GALAXY",
-        "noise": "SIM_NOISE",
+        "noise":  "SIM_NOISE",
         "object": "SIM_TEXTURE",
     };
 
@@ -188,20 +190,20 @@ var App = function() {
 
     _init();
 
-    // TODO_NOP TEST
-    _params.simMat.uniforms.tTarget = { type: "t", value: null };
-    var url = "obj/suzanne.obj";
-    var loader = new THREE.OBJLoader();
-    loader.load(url, function (object) {
-        var mesh = object.children[0];
-        mesh.scale.multiplyScalar(2.0);
-        _mapper.render(mesh, _mapTarget);
-        _params.simMat.uniforms.tTarget.value = _mapTarget;
-    });
-
     if (!Utils.isMobile) {
         _initUI();
         _initKeyboard();
+
+        // TODO_NOP TEST
+        _params.simMat.uniforms.tTarget = { type: "t", value: null };
+        var url = "obj/suzanne.obj";
+        var loader = new THREE.OBJLoader();
+        loader.load(url, function (object) {
+            var mesh = object.children[0];
+            mesh.scale.multiplyScalar(2.0);
+            _mapper.render(mesh, _mapTarget);
+            _params.simMat.uniforms.tTarget.value = _mapTarget;
+        });
     }
 
     _engine.start();
