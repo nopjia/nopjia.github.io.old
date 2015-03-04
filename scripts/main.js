@@ -1,1 +1,1 @@
-"use strict";console.log("Hello! My name is Nop!"),document.querySelector(".scheme-palette").onclick=function(e){var c=e.target.classList[0];document.body.className=c||""};
+"use strict";console.log("Hello! My name is Nop!"),Array.prototype.forEach.call(document.querySelector(".scheme-palette").children,function(e){e.onclick=function(){var c=e.classList[0];document.body.className=c||""}});
