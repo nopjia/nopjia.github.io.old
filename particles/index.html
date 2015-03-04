@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebGL GPU Particles 2</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div id="webgl-container" class="gradient-bg-cyan-black">
+        <canvas id="webgl-canvas"></canvas>
+    </div>
+    <div id="debug-box"></div>
+</body>
+
+<script type="text/javascript" src="js/lib/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="js/lib/dat.gui.min.js"></script>
+<script type="text/javascript" src="js/lib/mousetrap.js"></script>
+<script type="text/javascript" src="js/lib/three70.js"></script>
+<script type="text/javascript" src="js/lib/Stats.js"></script>
+<script type="text/javascript" src="js/lib/Clock.js"></script>
+<script type="text/javascript" src="js/lib/TrackballControls.js"></script>
+<script type="text/javascript" src="js/lib/OrbitControls.js"></script>
+<script type="text/javascript" src="js/lib/CopyShader.js"></script>
+<script type="text/javascript" src="js/lib/OBJLoader.js"></script>
+
+<script type="text/javascript" src="js/src/RenderContext.js"></script>
+<script type="text/javascript" src="js/src/ParticleEngine.js"></script>
+<script type="text/javascript" src="js/src/UpdateLoop.js"></script>
+<script type="text/javascript" src="js/src/Utils.js"></script>
+<script type="text/javascript" src="js/src/Mouse.js"></script>
+<script type="text/javascript" src="js/src/ShaderPass.js"></script>
+<script type="text/javascript" src="js/src/SimulationRenderer.js"></script>
+<script type="text/javascript" src="js/src/ParticleSimulation.js"></script>
+<script type="text/javascript" src="js/src/UVMapper.js"></script>
+<script type="text/javascript" src="js/src/App.js"></script>
+
+<script type="text/javascript" src="js/src/shaders/SimShader.js"></script>
+<script type="text/javascript" src="js/src/shaders/SimInitShader.js"></script>
+<script type="text/javascript" src="js/src/shaders/ParticleShader.js"></script>
+<script type="text/javascript" src="js/src/shaders/SimDebugShader.js"></script>
+<script type="text/javascript" src="js/src/shaders/UVMapShader.js"></script>
+
+<script>
+(function(){
+
+    var app = new App();
+
+})();
+</script>
+
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>WebGL</title>
+  
+  <meta name="description" content="WebGL Global Illumination Renderer">
+  <meta name="author" content="Nop Jiarathanakul">
+  <meta name="keywords" content="">
+
+  <link rel="stylesheet" href="css/reset.css" type="text/css">
+  <link rel="stylesheet" href="css/index.css" type="text/css">
+
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/Three.js"></script>
+  <script type="text/javascript" src="js/Stats.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+  
+  <!-- SHADERS -->
+  <script type="x-shader/x-vertex" id="shader-vs">
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+    
+    varying vec2 vUv;
+    
+    void main()
+    {
+      vUv = uv;
+      gl_Position = projectionMatrix *
+                    modelViewMatrix *
+                    vec4(position,1.0);
+    } 
+  </script>
+  
+  <script type="x-shader/x-fragment" id="shader-fs"></script>
+
+</head>
+
+<body>
+  <div id="menu" class="">
+    
+    <div id="info">
+      <table>
+        <thead>
+          <tr>
+            <td colspan=2>
+              Welcome
+              <span style="float:right">
+                <a href="http://nopjia.blogspot.com/search/label/distance%20field">Visit Blog</a>
+              </span>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Shift+Q</td>
+            <td>Show/hide menu</td>
+          </tr>
+          <tr>
+            <td>Shift+R</td>
+            <td>Reset camera</td>
+          </tr>
+          <tr>
+            <td>Shift+S</td>
+            <td>Take screenshot</td>
+          </tr>
+          <tr>
+            <td><button onclick="infoClose()">Next</a></button>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      
+    </div>
+    
+    <div class="submenu hidden">
+            
+      <div id="submenu-obj">
+        <h2>Object</h2>
+        <label class="radio">
+          <input type="radio" name="sceneobj" value="box" checked="checked">
+          Box
+        </label>
+        <label class="radio">
+          <input type="radio" name="sceneobj" value="roundbox">
+          Round Box
+        </label>
+        <label class="radio">
+          <input type="radio" name="sceneobj" value="ushape">
+          U-Shape
+        </label>
+        <label class="radio">
+          <input type="radio" name="sceneobj" value="menger">
+          Menger Box
+        </label>
+        <label class="radio">
+          <input type="radio" name="sceneobj" value="knot">
+          Knot
+        </label>
+        <label class="radio">
+          <input type="radio" name="sceneobj" value="quaternion">
+          Quaternion (beta!)
+        </label>
+      </div>
+      
+      <div id="submenu-scene">
+        <h2>Scene Options</h2>
+        <label class="checkbox">
+          <input type="checkbox" name="de_ground" checked="checked">
+          Ground Plane
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="de_warp">
+          Warp XZ Plane
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="de_displace">
+          Displaced Bumps
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="de_rotate">
+          Rotate Animation
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="de_twist">
+          Twist Animation
+        </label>
+      </div>
+      <button onclick="recompileShader()">Compile!</button>
+    </div>
+    
+    <div class="submenu hidden">
+      <p>
+        Max Steps
+        <select name="maxsteps">
+          <option>32</option>
+          <option selected="selected">64</option>
+          <option>128</option>
+          <option>256</option>
+        </select>
+      </p>      
+      
+      <label class="checkbox">
+        <input type="checkbox" name="check_bounds">
+        Check Bounds?
+      </label>
+      
+      <div id="submenu-render">
+        <h2>Render Mode</h2>
+        <label class="radio">
+          <input type="radio" name="render" value="col" checked="checked">
+          Color
+        </label>
+        <label class="radio">
+          <input type="radio" name="render" value="dist">
+          Distance
+        </label>
+        <label class="radio">
+          <input type="radio" name="render" value="steps">
+          Steps
+        </label>
+      </div>
+      
+      <div id="submenu-effects">
+        <h2>Effects</h2>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_diffuse" checked="checked">
+          Diffuse Shading
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_reflection">
+          Reflections
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_shadow">
+          Soft Shadows
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_occlusion">
+          Ambient Occlusion
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_subsurface">
+          Subsurface Scattering
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_fog">
+          Fog
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="fx_dither">
+          Focal Blur (beta!)
+        </label>
+      </div>
+    </div>
+  </div>
+  <div id="loading">
+    <p>Loading shader...</p>
+  </div>
+  <div id="webgl-container">    
+  </div>
+</body>
+</html>
