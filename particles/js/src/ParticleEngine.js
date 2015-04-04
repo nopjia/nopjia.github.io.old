@@ -8,6 +8,7 @@ var ParticleEngine = function(params) {
     var _sim, _simMat, _initMat, _drawMat;
     var _mouse;
     var _controls, _raycaster;
+    var _leapMan;
     var _customUpdate;
     var _pauseSim = false;
 
@@ -31,14 +32,16 @@ var ParticleEngine = function(params) {
     var _onFrameUpdate = function(dt, t) {
         _stats.begin();
 
-        if (!_controls.enabled) {
-            _mouseUpdate();
-            _controls.update();
-        }
+        _leapUpdate();
+
+        _inputUpdate();
+
+        if (!_controls.enabled) _controls.update();
 
         if(_customUpdate) _customUpdate(dt, t);
 
         _renderer.update(dt);
+        _leapMan.render();
 
         _stats.end();
     };
@@ -88,12 +91,18 @@ var ParticleEngine = function(params) {
 
         _raycaster = new THREE.Raycaster();
 
+        var tmat = (new THREE.Matrix4()).compose(
+            new THREE.Vector3(0.0, -3.0, -_camera.position.z),
+            new THREE.Quaternion(),
+            new THREE.Vector3(0.015,0.015,0.015));
+        _leapMan = new LeapManager(_renderer.getRenderer(), _camera, tmat);
+        _simMat.defines.MULTIPLE_INPUT = "";    // TODO_NOP: at least even hardcode numbers for this in shader
+        _simMat.needsUpdate = true;
+
         _debugBox = document.querySelector("#debug-box");
     };
 
     var _mouseUpdate = function() {
-        // _debugBox.innerHTML = "";
-
         var mIdMax = Utils.isMobile ? 4 : 1;
         for (var mId=0; mId<mIdMax; mId++) {
             var ms = _mouse.getMouse(mId);
@@ -111,18 +120,49 @@ var ParticleEngine = function(params) {
                 var point = _raycaster.ray.intersectPlane(plane);
 
                 _simMat.uniforms.uInputPos.value[mId].copy(point);
-                _simMat.uniforms.uInputPosFlag.value.setComponent(mId, ms.buttons[0] ? 1 : -1);
+                _simMat.uniforms.uInputPosAccel.value.setComponent(mId, ms.buttons[0] ? 1.0 : -1.0);
             }
             else {
-                _simMat.uniforms.uInputPosFlag.value.setComponent(mId, 0);
+                _simMat.uniforms.uInputPosAccel.value.setComponent(mId, 0);
             }
         }
 
         // _debugBox.innerHTML +=
-        //     "<br>"+_simMat.uniforms.uInputPosFlag.value.x.toFixed(2)
-        //     +" "+_simMat.uniforms.uInputPosFlag.value.y.toFixed(2)
-        //     +" "+_simMat.uniforms.uInputPosFlag.value.z.toFixed(2)
-        //     +" "+_simMat.uniforms.uInputPosFlag.value.w.toFixed(2);
+        //     "<br>"+_simMat.uniforms.uInputPosAccel.value.x.toFixed(2)
+        //     +" "+_simMat.uniforms.uInputPosAccel.value.y.toFixed(2)
+        //     +" "+_simMat.uniforms.uInputPosAccel.value.z.toFixed(2)
+        //     +" "+_simMat.uniforms.uInputPosAccel.value.w.toFixed(2);
+    };
+
+    var _leapUpdate = function() {
+        var K_PULL = 1.0;   // in grabStrength
+        var K_PUSH = 100.0; // in sphereRadius
+
+        _leapMan.update();
+
+        for (var i=0; i<_leapMan.activeHandCount; i++) {
+            var inputIdx = 3-i; // iterate backwards on input, so mouse can interact at same time
+            if (_leapMan.frame.hands[i].grabStrength === K_PULL) {
+                _simMat.uniforms.uInputPos.value[inputIdx].copy(_leapMan.palmPositions[i]);
+                _simMat.uniforms.uInputPosAccel.value.setComponent(inputIdx, 1.0);
+            }
+            else if (_leapMan.frame.hands[i].sphereRadius >= K_PUSH) {
+                _simMat.uniforms.uInputPos.value[inputIdx].copy(_leapMan.palmPositions[i]);
+                _simMat.uniforms.uInputPosAccel.value.setComponent(inputIdx, -1.0);
+            }
+        }
+
+        // _debugBox.innerHTML =
+        //     "hand1: " + (_leapMan.frame.hands[0] ? _leapMan.frame.hands[0].sphereRadius : "") + " " +
+        //     "hand2: " + (_leapMan.frame.hands[1] ? _leapMan.frame.hands[1].sphereRadius : "") +
+        //     "";
+    };
+
+    var _inputUpdate = function() {
+        // reset input accels
+        _simMat.uniforms.uInputPosAccel.value.set(0,0,0,0);
+        if (!_controls.enabled) _mouseUpdate();
+        _leapUpdate();
     };
 
 
